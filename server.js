@@ -3,7 +3,6 @@ var ehb = require("express-handlebars")
 var bodyParser = require("body-parser")
 var mongoose = require("mongoose")
 var cheerio = require("cheerio")
-// var axios = require("axios")
 var request = require("request")
 
 var db = require("./models")
@@ -38,15 +37,15 @@ app.get("/scrape", function(req, res) {
 results.headline = $(this)
     .children("div")
     .attr("headline")
-  results.title = $(this)
-  .children("a")
-  .text();
+results.title = $(this)
+    .children("a")
+    .text();
 results.link = $(this)
-  .children("a")
-  .attr("href");
-  results.blurb = $(this)
-  .children("div")
-  .attr("blurb")
+    .children("a")
+    .attr("href");
+results.blurb = $(this)
+    .children("div")
+    .attr("blurb")
     // Save the text of the element in a "title" variable
     
 console.log(results)
