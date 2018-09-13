@@ -4,12 +4,29 @@ var bodyParser = require("body-parser")
 var mongoose = require("mongoose")
 var cheerio = require("cheerio")
 var request = require("request")
+// var Article = require("./models/article.js")
 
 var db = require("./models")
 
 var PORT = 3000
 
 var app = express()
+
+app.engine("handlebars", ehb({
+  defaultLayout: "main"
+  // partialsDir: path.join(__dirname, "/views/layouts/partials")
+}));
+app.set("view engine", "handlebars");
+
+app.get("/", function(req, res) {
+
+  //   // var hbsObject = {
+  //   //   article: data
+  //   // };
+  
+    
+    res.render("index", res);
+  });
 
 // This is what drive handling the submission from the front-end form
 app.use(bodyParser.urlencoded({extended: true}))
@@ -18,6 +35,11 @@ app.use(express.static("public"))
 
 mongoose.connect("mongodb://localhost/NewsScraper")
 
+
+
+
+var results = {};
+
 // A GET route for scraping the echoJS website
 app.get("/scrape", function(req, res) {
     // First, we grab the body of the html with request
@@ -25,15 +47,11 @@ app.get("/scrape", function(req, res) {
       // Then, we load that into cheerio and save it to $ for a shorthand selector
       var $ = cheerio.load(html);
       
-      // Now, we grab every h2 within an article tag, and do the following:
       $("div.headline").each(function(i, element) {
 
         // Save an empty result object
-       var results = {};
+      //  results
 
-// var title = $(element).text();
-// var link = $(element).children().attr("a");
-// var blurb = $(element).children().attr("blurb")
 results.headline = $(this)
     .children("div")
     .attr("headline")
@@ -46,14 +64,13 @@ results.link = $(this)
 results.blurb = $(this)
     .children("div")
     .attr("blurb")
-    // Save the text of the element in a "title" variable
-    
-console.log(results)
+
 
 db.Article.create(results)
 .then(function(dbArticle) {
   // View the added result in the console
   console.log(dbArticle);
+  console.log("new")
 })
 .catch(function(err) {
   // If an error occurred, send it to the client
@@ -71,6 +88,8 @@ db.Article.create(results)
     //   blurb: blurb
     // });
   });
+
+
 
   // Log the results once you've looped through each of the elements found with cheerio
  
@@ -121,6 +140,8 @@ db.Article.create(results)
       res.send("Scrape Complete");
     });
 //   });
+
+
 
 // Route for getting all Articles from the db
 app.get("/articles", function(req, res) {
