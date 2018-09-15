@@ -71,7 +71,7 @@ app.get("/scrape", function (req, res) {
           .attr("blurb")
           
           
-          var results = {
+          var newsResults = {
             headline: headline,
             title: title,
             link: link,
@@ -92,7 +92,7 @@ app.get("/scrape", function (req, res) {
         //   link: link,
         //   blurb: blurb
         // });
-        db.Article.create(results)
+        db.Article.create(newsResults)
           .then(function (dbArticle) {
             // View the added result in the console
             console.log(dbArticle);
