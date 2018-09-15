@@ -53,23 +53,30 @@ app.get("/scrape", function (req, res) {
       var $ = cheerio.load(html);
 
       $("div.headline").each(function (i, element) {
-        var results = {};
+        
         // Save an empty result object
         //  results
 
-        results.headline = $(this)
+        var headline = $(this)
           .children("div")
           .attr("headline")
-        results.title = $(this)
+        var title = $(this)
           .children("a")
           .text();
-        results.link = $(this)
+        var link = $(this)
           .children("a")
           .attr("href");
-        results.blurb = $(this)
+        var blurb = $(this)
           .children("div")
           .attr("blurb")
-
+          
+          
+          var results = {
+            headline: headline,
+            title: title,
+            link: link,
+            blurb:blurb
+          };
         // .catch(function(err) {
         //   // If an error occurred, send it to the client
         //   return res.json(err);
