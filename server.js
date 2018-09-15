@@ -8,7 +8,7 @@ var request = require("request")
 
 var db = require("./models")
 
-var PORT = 3000
+
 
 var app = express()
 
@@ -18,7 +18,7 @@ app.engine("handlebars", ehb({
 }));
 app.set("view engine", "handlebars");
 
-mongoose.connect("mongodb://localhost/NewsScraper")
+// mongoose.connect("mongodb://localhost/NewsScraper")
 
 
 
@@ -28,9 +28,14 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.static("public"))
 
 
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/NewsScraper";
 
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
 
-
+var PORT = process.env.PORT || 3000;
 
 var results = {};
 
