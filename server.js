@@ -4,7 +4,7 @@ var bodyParser = require("body-parser")
 var mongoose = require("mongoose")
 var cheerio = require("cheerio")
 var request = require("request")
-// var Article = require("./models/article.js")
+// var Article = require("./models/Article.js")
 
 var db = require("./models")
 
@@ -18,22 +18,16 @@ app.engine("handlebars", ehb({
 }));
 app.set("view engine", "handlebars");
 
-app.get("/", function(req, res) {
+mongoose.connect("mongodb://localhost/NewsScraper")
 
-  //   // var hbsObject = {
-  //   //   article: data
-  //   // };
-  
-    
-    res.render("index", res);
-  });
+
 
 // This is what drive handling the submission from the front-end form
 app.use(bodyParser.urlencoded({extended: true}))
 
 app.use(express.static("public"))
 
-mongoose.connect("mongodb://localhost/NewsScraper")
+
 
 
 
@@ -44,9 +38,15 @@ var results = {};
 app.get("/scrape", function(req, res) {
     // First, we grab the body of the html with request
     request("https://www.washingtonpost.com/", function(err, response, html) {
+
+    if (err) {
+      console.log(err)
+    } else {
+
+    
       // Then, we load that into cheerio and save it to $ for a shorthand selector
       var $ = cheerio.load(html);
-      
+    
       $("div.headline").each(function(i, element) {
 
         // Save an empty result object
@@ -65,17 +65,10 @@ results.blurb = $(this)
     .children("div")
     .attr("blurb")
 
-
-db.Article.create(results)
-.then(function(dbArticle) {
-  // View the added result in the console
-  console.log(dbArticle);
-  console.log("new")
-})
-.catch(function(err) {
-  // If an error occurred, send it to the client
-  return res.json(err);
-});
+// .catch(function(err) {
+//   // If an error occurred, send it to the client
+//   return res.json(err);
+// });
     // In the currently selected element, look at its child elements (i.e., its a-tags),
     // then save the values for any "href" attributes that the child elements may have
     
@@ -87,6 +80,16 @@ db.Article.create(results)
     //   link: link,
     //   blurb: blurb
     // });
+    db.Article.create(results)
+    .then(function(dbArticle) {
+      // View the added result in the console
+      console.log(dbArticle);
+    })
+    .catch(function(err) {
+      console.log("in the catch")
+      // If an error occurred, send it to the client
+      return res.json(err);
+    });
   });
 
 
@@ -102,16 +105,8 @@ db.Article.create(results)
         //   .attr("href");
   
         // Create a new Article using the `result` object built from scraping
-        // db.Article.create(result)
-        //   .then(function(dbArticle) {
-            // View the added result in the console
-            // console.log(dbArticle);
-        //   })
-        //   .catch(function(err) {
-            // If an error occurred, send it to the client
-            // return res.json(err);
-        //   });
-
+       
+        }
            // Save the text of the element in a "title" variable
     // var title = customFilter.clean($(element).text());
 
@@ -120,10 +115,10 @@ db.Article.create(results)
     // var link = $(element).children().attr("href");
 
     // Save these results in an object that we'll push into the results array we defined earlier
-//     results.push({
-//       title: title,
-//       link: link
-//     });
+    // results.push({
+    //   title: title,
+    //   link: link
+    // });
 //   });
 
   // Log the results once you've looped through each of the elements found with cheerio
@@ -141,6 +136,15 @@ db.Article.create(results)
     });
 //   });
 
+app.get("/", function(req, res) {
+
+  var hbsObject = {
+    Article: res
+  };
+
+  
+  res.render("index", hbsObject);
+});
 
 
 // Route for getting all Articles from the db
