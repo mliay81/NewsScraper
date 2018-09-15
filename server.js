@@ -37,7 +37,7 @@ mongoose.connect(MONGODB_URI);
 
 var PORT = process.env.PORT || 3000;
 
-var results = {};
+
 
 // A GET route for scraping the echoJS website
 app.get("/scrape", function (req, res) {
@@ -53,7 +53,7 @@ app.get("/scrape", function (req, res) {
       var $ = cheerio.load(html);
 
       $("div.headline").each(function (i, element) {
-
+        var results = {};
         // Save an empty result object
         //  results
 
